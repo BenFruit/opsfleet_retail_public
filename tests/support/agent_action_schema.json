@@ -1,0 +1,128 @@
+{
+ "$defs": {
+  "RememberRequest": {
+   "additionalProperties": false,
+   "properties": {
+    "memories": {
+     "items": {
+      "maxLength": 200,
+      "minLength": 1,
+      "type": "string"
+     },
+     "maxItems": 5,
+     "minItems": 1,
+     "title": "Memories",
+     "type": "array"
+    }
+   },
+   "required": [
+    "memories"
+   ],
+   "title": "RememberRequest",
+   "type": "object"
+  },
+  "ReportRequest": {
+   "additionalProperties": false,
+   "properties": {
+    "operation": {
+     "enum": [
+      "save",
+      "search",
+      "open",
+      "list",
+      "prepare_delete"
+     ],
+     "title": "Operation",
+     "type": "string"
+    },
+    "query": {
+     "description": "Nonempty search text for search or matching deletion. Empty string for all other operations.",
+     "maxLength": 1000,
+     "title": "Query",
+     "type": "string"
+    },
+    "report_id": {
+     "default": "",
+     "maxLength": 32,
+     "title": "Report Id",
+     "type": "string"
+    },
+    "scope": {
+     "default": "matching",
+     "enum": [
+      "matching",
+      "conversation",
+      "all",
+      "id"
+     ],
+     "title": "Scope",
+     "type": "string"
+    },
+    "title": {
+     "default": "",
+     "maxLength": 255,
+     "title": "Title",
+     "type": "string"
+    }
+   },
+   "required": [
+    "operation",
+    "query"
+   ],
+   "title": "ReportRequest",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "properties": {
+  "action": {
+   "enum": [
+    "query",
+    "answer",
+    "report",
+    "remember"
+   ],
+   "title": "Action",
+   "type": "string"
+  },
+  "answer": {
+   "default": "",
+   "maxLength": 8000,
+   "title": "Answer",
+   "type": "string"
+  },
+  "remember": {
+   "anyOf": [
+    {
+     "$ref": "#/$defs/RememberRequest"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null
+  },
+  "report": {
+   "anyOf": [
+    {
+     "$ref": "#/$defs/ReportRequest"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null
+  },
+  "sql": {
+   "default": "",
+   "maxLength": 20000,
+   "title": "Sql",
+   "type": "string"
+  }
+ },
+ "required": [
+  "action"
+ ],
+ "title": "AgentAction",
+ "type": "object"
+}

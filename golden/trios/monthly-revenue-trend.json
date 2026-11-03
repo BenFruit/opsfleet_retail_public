@@ -1,0 +1,28 @@
+{
+  "id": "monthly-revenue-trend",
+  "version": 1,
+  "status": "approved",
+  "question": "How has our revenue developed month by month over the last year?",
+  "paraphrases": [
+    "Show monthly revenue for the past 12 months",
+    "Revenue trend by month"
+  ],
+  "interpretation": "Revenue means completed item revenue: SUM(order_items.sale_price) with status 'Complete'. Use the last 12 FULL calendar months and exclude the current partial month, otherwise the last point looks like a false drop. Report orders and average order value next to revenue so growth can be split into volume and basket size.",
+  "metric_definitions": [
+    "completed_revenue = SUM(oi.sale_price) WHERE oi.status = 'Complete'",
+    "orders = COUNT(DISTINCT oi.order_id)",
+    "avg_order_value = completed_revenue / orders"
+  ],
+  "grain": "calendar month, last 12 complete months",
+  "sql": "SELECT DATE_TRUNC(DATE(oi.created_at), MONTH) AS month,\n  ROUND(SUM(oi.sale_price), 2) AS completed_revenue,\n  COUNT(DISTINCT oi.order_id) AS orders,\n  ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)), 2) AS avg_order_value\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nWHERE oi.status = 'Complete'\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 12 MONTH)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\nGROUP BY month\nORDER BY month",
+  "analyst_report": "Summary: completed revenue moved from <first_month_revenue> to <last_month_revenue> over the last 12 complete months.\nDrivers: compare order count and average order value; growth driven by orders signals demand, growth driven by AOV signals mix or pricing.\nCaveats: current month excluded as incomplete; seasonality is visible only against the same month last year.\nActions: investigate the months with the largest drop; check whether promotions coincide with AOV changes.",
+  "tags": [
+    "revenue",
+    "trend",
+    "monthly",
+    "kpi"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

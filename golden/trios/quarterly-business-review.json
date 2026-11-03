@@ -1,0 +1,29 @@
+{
+  "id": "quarterly-business-review",
+  "version": 2,
+  "status": "approved",
+  "question": "Create a report for Q1 including insights and action items for Q2.",
+  "paraphrases": [
+    "Quarterly business review",
+    "Q3 report with recommendations"
+  ],
+  "interpretation": "A quarter is a calendar quarter of the current year unless the user names a year; if it is not complete yet, say so and use the last complete quarter. A good report needs several queries: KPI by month inside the quarter versus the previous quarter, category mix and returns. Structure: executive summary, KPIs, drivers, risks, actions for the next quarter with owners. Separate evidence from hypotheses. Get quarter totals (revenue, orders, buyers) from a separate query without the category breakdown; never add category rows together in prose, because orders and buyers are not additive across categories and mental sums are error-prone.",
+  "metric_definitions": [
+    "completed_revenue, orders, buyers, avg_order_value per month",
+    "quarter_over_quarter_change = (quarter - previous_quarter) / previous_quarter",
+    "category_share = category revenue / total revenue"
+  ],
+  "grain": "calendar quarter vs previous quarter, monthly and category breakdown",
+  "sql": "SELECT DATE_TRUNC(DATE(oi.created_at), QUARTER) AS quarter,\n  p.category AS category,\n  ROUND(SUM(oi.sale_price), 2) AS completed_revenue,\n  COUNT(DISTINCT oi.order_id) AS orders,\n  COUNT(DISTINCT oi.user_id) AS buyers\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nJOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id\nWHERE oi.status = 'Complete'\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), QUARTER), INTERVAL 2 QUARTER)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), QUARTER)\nGROUP BY quarter, category\nORDER BY quarter, completed_revenue DESC",
+  "analyst_report": "Executive summary: <quarter> completed revenue <revenue> (<qoq_change> versus <previous_quarter>).\nKPIs: orders <orders>, buyers <buyers>, AOV <aov>.\nDrivers: <top_growing_categories> grew; <declining_categories> declined.\nRisks: rising returns in <category>; dependence on <top_category>.\nActions for next quarter: 1) <action> (owner: merchandising); 2) <action> (owner: marketing); 3) <action> (owner: operations). Each action names the metric that will track it.",
+  "tags": [
+    "report",
+    "quarterly",
+    "qbr",
+    "actions",
+    "kpi"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T07:30:00Z"
+}

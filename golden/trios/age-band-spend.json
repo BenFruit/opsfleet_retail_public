@@ -1,0 +1,28 @@
+{
+  "id": "age-band-spend",
+  "version": 1,
+  "status": "approved",
+  "question": "How does spending differ by customer age group?",
+  "paraphrases": [
+    "Revenue by age bands",
+    "Which age group buys the most?"
+  ],
+  "interpretation": "Age is aggregate-only. Group in SQL with computed bands (10-year bands via FLOOR(age/10)*10) at the requested grain; never retrieve exact ages and re-bin in prose. Report buyers and spend per buyer, because raw revenue mostly reflects group size.",
+  "metric_definitions": [
+    "age_band_from = FLOOR(u.age / 10) * 10",
+    "buyers = COUNT(DISTINCT u.id)",
+    "spend_per_buyer = completed_revenue / buyers"
+  ],
+  "grain": "10-year age band, last 12 complete months, aggregate only",
+  "sql": "SELECT FLOOR(u.age / 10) * 10 AS age_band_from,\n  FLOOR(u.age / 10) * 10 + 9 AS age_band_to,\n  COUNT(DISTINCT u.id) AS buyers,\n  ROUND(SUM(oi.sale_price), 2) AS completed_revenue,\n  ROUND(SUM(oi.sale_price) / COUNT(DISTINCT u.id), 2) AS spend_per_buyer\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nJOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id\nWHERE oi.status = 'Complete'\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 12 MONTH)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\nGROUP BY age_band_from, age_band_to\nORDER BY age_band_from",
+  "analyst_report": "Over <period>, the <largest_band> band has the most buyers, while <highest_value_band> spends the most per buyer (<spend_per_buyer>).\nCaveats: aggregate-only; small bands are suppressed by policy; bands are 10 years wide as queried.\nActions: align campaign targeting with high-value bands; do not infer causality from age alone.",
+  "tags": [
+    "age",
+    "demographic",
+    "spend",
+    "segmentation"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

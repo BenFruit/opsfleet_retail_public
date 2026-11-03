@@ -1,0 +1,22 @@
+flowchart TD
+    INPUT["CLI input"] --> CMD{"Direct command?"}
+    CMD -->|"confirm/cancel or memory commands"| DIRECT["Deterministic owner-scoped operation, no model"]
+    CMD -->|"ordinary question"| INIT["Cancel pending deletion; snapshot persona; load bounded memory; retrieve up to 3 Golden precedents; initialize budgets"]
+    INIT --> PLAN["plan: Gemini returns one validated action"]
+    PLAN --> ACT{"Action"}
+    ACT -->|query| QUERY["query: SQL policy, trusted scope, dry run, execute, result checks"]
+    ACT -->|report| REPORT["reports: parameterized library operation or deletion preview"]
+    ACT -->|remember| MEM["remember: explicit intent gate, embeddings, atomic owner write"]
+    QUERY --> OBS["Bounded observation and updated counters"]
+    REPORT -->|"search with results"| OBS
+    REPORT -->|"save, open, list, deletion preview, error"| OUT
+    MEM --> OBS
+    OBS --> BUDGET{"Budget remains and safe to continue?"}
+    BUDGET -->|yes| PLAN
+    BUDGET -->|no| STOP["Controlled stop with limitations"]
+    PLAN -->|"malformed action, at most two corrections"| PLAN
+    ACT -->|answer| FINAL["Text checks, checked tables and verified tool outcomes"]
+    STOP --> OUT["CLI response"]
+    FINAL --> OUT
+    DIRECT --> OUT
+    NOTE["SQL: initial attempt + two repairs; no blind ambiguous execution or write retries"] -.-> QUERY

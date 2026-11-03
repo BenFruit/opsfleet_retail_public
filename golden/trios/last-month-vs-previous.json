@@ -1,0 +1,28 @@
+{
+  "id": "last-month-vs-previous",
+  "version": 1,
+  "status": "approved",
+  "question": "How did last month perform compared to the month before?",
+  "paraphrases": [
+    "Compare last month with the previous month",
+    "Month over month performance"
+  ],
+  "interpretation": "'Last month' is the previous FULL calendar month, compared like-for-like with the month before it, never with the current partial month. State the exact date boundaries. Compare completed revenue, orders, buyers and AOV, and show absolute and relative change.",
+  "metric_definitions": [
+    "completed_revenue = SUM(oi.sale_price) WHERE status = 'Complete'",
+    "buyers = COUNT(DISTINCT oi.user_id)",
+    "change_pct = (last - previous) / previous"
+  ],
+  "grain": "two complete calendar months",
+  "sql": "SELECT DATE_TRUNC(DATE(oi.created_at), MONTH) AS month,\n  ROUND(SUM(oi.sale_price), 2) AS completed_revenue,\n  COUNT(DISTINCT oi.order_id) AS orders,\n  COUNT(DISTINCT oi.user_id) AS buyers,\n  ROUND(SAFE_DIVIDE(SUM(oi.sale_price), COUNT(DISTINCT oi.order_id)), 2) AS avg_order_value\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nWHERE oi.status = 'Complete'\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 2 MONTH)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\nGROUP BY month\nORDER BY month",
+  "analyst_report": "Period: <last_month_start> to <last_month_end> versus <previous_month_start> to <previous_month_end>.\nResult: completed revenue changed by <revenue_change_pct>; orders by <orders_change_pct>; buyers by <buyers_change_pct>; AOV by <aov_change_pct>.\nInterpretation: if buyers fell but AOV held, the issue is acquisition or retention rather than pricing.\nActions: break the change down by category and brand before drawing causal conclusions.",
+  "tags": [
+    "revenue",
+    "comparison",
+    "month-over-month",
+    "kpi"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

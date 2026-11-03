@@ -1,0 +1,30 @@
+{
+  "id": "state-spend-comparison",
+  "version": 1,
+  "status": "approved",
+  "question": "Why are users in state X underspending, and how do they compare to users in state Y?",
+  "paraphrases": [
+    "Compare spending by state",
+    "Customers in California vs Texas"
+  ],
+  "interpretation": "State is a location attribute and may only be used in aggregates; groups with too few distinct buyers are suppressed by the application. Underspending is spend per buyer, split into orders per buyer and average order value, so the answer shows whether frequency or basket size differs. State is a worldwide region field; do not assume the US.",
+  "metric_definitions": [
+    "buyers = COUNT(DISTINCT u.id)",
+    "spend_per_buyer = completed_revenue / buyers",
+    "orders_per_buyer = COUNT(DISTINCT oi.order_id) / buyers",
+    "avg_order_value = completed_revenue / orders"
+  ],
+  "grain": "state, last 12 complete months, aggregate only",
+  "sql": "SELECT u.state AS state,\n  COUNT(DISTINCT u.id) AS buyers,\n  ROUND(SUM(oi.sale_price), 2) AS completed_revenue,\n  ROUND(SUM(oi.sale_price) / COUNT(DISTINCT u.id), 2) AS spend_per_buyer,\n  ROUND(COUNT(DISTINCT oi.order_id) / COUNT(DISTINCT u.id), 3) AS orders_per_buyer,\n  ROUND(SUM(oi.sale_price) / COUNT(DISTINCT oi.order_id), 2) AS avg_order_value\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nJOIN `bigquery-public-data.thelook_ecommerce.users` AS u ON oi.user_id = u.id\nWHERE oi.status = 'Complete'\n  AND u.state IN ('California', 'Texas')\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 12 MONTH)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\nGROUP BY state\nORDER BY spend_per_buyer",
+  "analyst_report": "Comparison over <period>: buyers in <state_x> spend <spend_x> per buyer versus <spend_y> in <state_y>.\nDecomposition: orders per buyer <freq_x> vs <freq_y>; AOV <aov_x> vs <aov_y>. The gap comes mainly from <frequency_or_basket>.\nCaveats: aggregate-only; small groups are suppressed; absence of a state can mean suppression, not zero buyers.\nActions: if frequency drives the gap, test retention offers; if basket size, test bundles or free-shipping thresholds.",
+  "tags": [
+    "geography",
+    "state",
+    "demographic",
+    "spend",
+    "comparison"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

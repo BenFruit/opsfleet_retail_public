@@ -1,0 +1,45 @@
+%% One analytical question end to end. Implemented in the prototype except the
+%% API/identity hop (the CLI uses a trusted startup identity instead).
+sequenceDiagram
+    autonumber
+    actor U as Executive
+    participant API as Chat API / CLI
+    participant A as Agent (LangGraph)
+    participant K as Golden retrieval
+    participant G as Gemini
+    participant Q as QueryService
+    participant BQ as BigQuery
+    participant PG as PostgreSQL + pgvector
+
+    U->>API: question
+    API->>A: question + trusted brands (never from the model)
+    A->>A: input checks, cancel pending deletion, snapshot persona version
+    A->>PG: load user preferences (owner-scoped)
+    A->>K: retrieve precedents
+    K->>G: embed question
+    K->>PG: vector + lexical search, threshold 0.65, top 3
+    K-->>A: reviewed trios (or none if unavailable)
+    loop until answer or budget stop (7 model calls, 5 SQL, 300 MB)
+        A->>G: schema, history, observations, precedents, budgets
+        G-->>A: one JSON action (query, report, remember or answer)
+        alt query
+            A->>Q: SQL
+            Q->>Q: SQLGlot policy: no PII columns, aggregate-only demographics
+            Q->>Q: rewrite every table to authorized brands, add cohort guard
+            Q->>BQ: dry run, then capped execution (job id, timeout)
+            BQ-->>Q: rows
+            Q-->>A: bounded rows
+            A->>A: result guard: shape, scalars, size, cohort check
+            A->>A: observation, or safe error and repair (initial + 2)
+        else answer
+            A->>A: numeric grounding of prose figures
+            opt ungrounded figures
+                A->>G: feedback "compute totals with a query" (one correction)
+            end
+        end
+    end
+    A->>A: append authoritative checked tables, scope line
+    A-->>API: answer (the model cites "Method: trio vN" when it used a precedent)
+    A--)PG: nothing is written unless the user asked to save or remember
+    API-->>U: answer
+    Note over A: every step logs turn_id/query_id events, optional trace spans

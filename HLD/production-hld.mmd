@@ -1,0 +1,57 @@
+%% PROPOSED production serving architecture on Google Cloud (online path).
+%% Offline Golden ingestion, evaluation gates and feedback mining: learning-loop.mmd.
+%% The prototype implements the agent runtime, typed tools, BigQuery path and
+%% PostgreSQL stores locally behind a CLI with a trusted startup identity.
+flowchart TB
+    subgraph Clients["Clients"]
+        CLI["CLI (prototype)"]
+        WEB["Web or Slack client"]
+    end
+
+    subgraph Edge["Edge and identity"]
+        LB["HTTPS Load Balancer + Cloud Armor"]
+        IDP["IAP / OIDC: company IdP"]
+    end
+
+    subgraph Run["Cloud Run service: stateless, autoscaled"]
+        API["Chat API: identity, session, streaming, rate limits"]
+        AGENT["Agent runtime: LangGraph loop, budgets, numeric grounding"]
+        TOOLS["Typed tools: QueryService, Reports, Memory, Golden retrieval; later Charts, Email, Web search"]
+    end
+
+    subgraph AI["Vertex AI"]
+        GEM["Gemini planner + fallback model"]
+        EMB["Gemini embeddings"]
+    end
+
+    subgraph Data["Data stores"]
+        BQ[("BigQuery TheLook: authorized views, row access by brand")]
+        PG[("Cloud SQL PostgreSQL + pgvector: sessions, confirmations, reports, memory, Golden index, persona versions")]
+        ENT[("Entitlements: manager to brands")]
+        SEC["Secret Manager"]
+    end
+
+    subgraph Ops["Observability"]
+        LOGS["Cloud Logging: allowlisted JSON events, sink to BigQuery"]
+        TRACE["LLM tracing: Langfuse as a separate shared platform, optional; masked"]
+        MON["Cloud Monitoring: SLOs, alerts"]
+    end
+
+    PERSONA["Persona console: draft, preview, publish, rollback"]
+
+    CLI --> LB
+    WEB --> LB
+    LB --> IDP --> API
+    ENT -->|"trusted brand scope"| API
+    SEC -.->|"keys, DB credentials"| API
+    API --> AGENT
+    AGENT <-->|"JSON actions, Pydantic-validated, retry + fallback"| GEM
+    AGENT --> TOOLS
+    TOOLS -->|"AST-validated, brand-scoped SQL, dry run, byte caps"| BQ
+    ENT -->|"row access policy"| BQ
+    TOOLS <-->|"parameterized SQL, owner-scoped"| PG
+    TOOLS -->|"query embeddings"| EMB
+    PERSONA -->|"versioned style, no redeploy"| PG
+    AGENT -.->|"events"| LOGS
+    AGENT -.->|"spans"| TRACE
+    LOGS --> MON

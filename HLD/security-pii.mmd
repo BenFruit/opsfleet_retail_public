@@ -1,0 +1,16 @@
+flowchart TB
+    POLICY["Curated column policy: allowed / aggregate-only / blocked PII / blocked unscoped"] --> AST
+    REQ["Checked user input + startup identity"] --> MODEL["Gemini proposes SQL"]
+    MODEL --> AST["SQLGlot source, column and AST validation"]
+    AST --> DEMO["If demographic: flat aggregate shape + canonical joins + common contributor guard"]
+    DEMO --> SCOPE["Rewrite EVERY physical source to authorized brands and approved columns"]
+    RIGHTS["Trusted brand parameters"] --> SCOPE
+    SCOPE --> DRY["Dry run, billed-byte cap and execution bounds"]
+    DRY --> BQ[("BigQuery")]
+    BQ --> RESULT["Result guard in the agent: cohort recheck, shape, scalar, size and text checks"]
+    RESULT --> SAFE["Only checked bounded observations to Gemini"]
+    SAFE --> ANSWER["Final text checks + app-rendered checked tables"]
+    AST -->|reject| ERROR["Controlled feedback; bounded safe repair"]
+    DEMO -->|reject| ERROR
+    RESULT -->|reject| ERROR
+    GAP["NOT solved: cross-question inference, comprehensive free-text PII and raw optional Langfuse export"]

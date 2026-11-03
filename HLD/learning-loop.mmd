@@ -1,0 +1,26 @@
+%% Continuous improvement. User level: implemented (explicit memory).
+%% System level: the review/promotion path is implemented manually in the
+%% prototype (trio v2 after a failed live run); mining and automation are proposed.
+flowchart TB
+    subgraph User["User level: preferences"]
+        ASK["'Use bullet points, remember this'"] --> GATE1{"Explicit remember intent?"}
+        GATE1 -->|"no: one-off style"| ONCE["Apply to this answer only"]
+        GATE1 -->|"yes"| MEM[("Owner-scoped memory: max 20 short entries")]
+        MEM --> CTX["Loaded into every turn as preferences; never as permissions"]
+        CTX --> INSPECT["/memories, /forget ID, /forget-all"]
+    end
+
+    subgraph System["System level: methods and quality"]
+        SIG["Signals: thumbs-down, SQL repairs, empty results, ungrounded figures, eval failures"] --> QUEUE["Sanitized candidate queue"]
+        QUEUE --> ANALYST["Analyst writes or fixes a trio, or a prompt/metric rule"]
+        ANALYST --> PR["Pull request: review by a second analyst"]
+        PR --> INGEST["Golden ingest: policy validation, BigQuery dry run, re-embed changed only"]
+        INGEST --> EVAL["Retrieval + answer evaluation (A/B vs current release)"]
+        EVAL -->|"pass"| PUBLISH["Atomic index publish / canary release"]
+        EVAL -->|"fail"| ANALYST
+        PUBLISH --> AGENT["Agent retrieves the new version at query time"]
+        AGENT --> SIG
+    end
+
+    NOTE["No autonomous self-modification: the agent can read Golden Knowledge but never write it"]
+    NOTE -.-> AGENT

@@ -1,0 +1,27 @@
+{
+  "id": "dataset-overview",
+  "version": 1,
+  "status": "approved",
+  "question": "What data is available and what can we analyze with it?",
+  "paraphrases": [
+    "Describe the database",
+    "What tables do we have?"
+  ],
+  "interpretation": "Answer schema questions from the provided schema, without inventing tables. Explain the four tables, their grain and the access rules: product and order data are scoped to authorized brands, customer demographics are aggregate-only, direct contact details are never available. Optionally run one cheap query for the covered date range and volume.",
+  "metric_definitions": [
+    "first_date / last_date = MIN/MAX(DATE(oi.created_at))",
+    "items = COUNT(*) of order_items in scope"
+  ],
+  "grain": "whole authorized scope",
+  "sql": "SELECT MIN(DATE(oi.created_at)) AS first_date,\n  MAX(DATE(oi.created_at)) AS last_date,\n  COUNT(*) AS items,\n  COUNT(DISTINCT oi.order_id) AS orders,\n  COUNT(DISTINCT oi.product_id) AS products\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi",
+  "analyst_report": "Available data: orders (order-level status and timestamps), order_items (one row per item with price and status), products (catalog with brand, category, cost) and users (customer attributes, aggregate-only).\nScope: your authorized brands from <first_date> to <last_date>, <items> items.\nYou can analyze: revenue and margin trends, product and brand performance, customer value by ID, and aggregate demographics.\nNot available: marketing spend, return reasons, customer contact details.",
+  "tags": [
+    "schema",
+    "overview",
+    "help",
+    "metadata"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

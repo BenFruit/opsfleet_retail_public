@@ -1,0 +1,49 @@
+[project]
+name = "retail_agent"
+version = "0.1.0"
+description = "Brand-scoped retail analysis chat agent (Gemini + BigQuery)"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-cloud-bigquery>=3.46.2",
+    "google-genai>=2.34.0",
+    "langgraph>=1.2.18",
+    "langfuse>=3.0,<6",
+    "pydantic>=2.14.1",
+    "psycopg[binary]>=3.2,<4",
+    "sqlglot>=30.25.0",
+    "pydantic-settings>=2.16.2",
+    "langsmith>=0.14.16",
+    "httpx>=0.28.1",
+    "google-api-core>=2.43.0",
+]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# tests/support holds shared helpers; importlib mode allows equal file names in different folders.
+pythonpath = ["tests"]
+addopts = ["--import-mode=importlib", "-p", "no:cacheprovider"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+# Python sources only; documentation (including archived code samples) stays as written.
+include = ["*.py"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, import order, bugbear, pyupgrade, simplify.
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
+# The formatter enforces line length; long message and SQL string literals stay whole.
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["retail_agent", "support"]

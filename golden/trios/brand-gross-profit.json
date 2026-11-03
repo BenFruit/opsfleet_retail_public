@@ -1,0 +1,27 @@
+{
+  "id": "brand-gross-profit",
+  "version": 1,
+  "status": "approved",
+  "question": "Which of our brands drove gross profit last month?",
+  "paraphrases": [
+    "Brand profitability last month",
+    "Margin by brand"
+  ],
+  "interpretation": "Estimated gross profit is SUM(sale_price - product cost) for completed items, never cost minus price. Product cost is the current catalog cost, so label it an estimate. Use the previous full calendar month.",
+  "metric_definitions": [
+    "estimated_gross_profit = SUM(oi.sale_price - p.cost) WHERE status = 'Complete'",
+    "margin_pct = estimated_gross_profit / completed_revenue"
+  ],
+  "grain": "brand, previous complete calendar month",
+  "sql": "SELECT p.brand AS brand,\n  ROUND(SUM(oi.sale_price), 2) AS completed_revenue,\n  ROUND(SUM(oi.sale_price - p.cost), 2) AS estimated_gross_profit,\n  ROUND(SAFE_DIVIDE(SUM(oi.sale_price - p.cost), SUM(oi.sale_price)), 4) AS margin_pct\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nJOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id\nWHERE oi.status = 'Complete'\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 1 MONTH)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\nGROUP BY brand\nORDER BY estimated_gross_profit DESC",
+  "analyst_report": "Period: <month>. <top_brand> generated the largest estimated gross profit (<top_brand_profit>, margin <top_brand_margin>).\nMix: brands with high revenue but low margin may depend on discounting.\nCaveats: cost is current catalog cost, not historical accounting cost.\nActions: review pricing for low-margin high-volume brands; protect stock for high-margin brands.",
+  "tags": [
+    "brand",
+    "profit",
+    "margin",
+    "monthly"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

@@ -1,0 +1,30 @@
+{
+  "id": "customer-churn-proxy",
+  "version": 2,
+  "status": "approved",
+  "question": "Why did our churn rate spike last month?",
+  "paraphrases": [
+    "Customer churn trend",
+    "Are we losing customers?"
+  ],
+  "interpretation": "The dataset has no subscriptions, so churn is a proxy: the share of buyers active in month M who made no purchase in month M+1 (lapse rate). Compare the latest complete transition with the preceding months before calling it a spike. Repeat purchases in consecutive months are rare in this data, so lapse rates near 100% in every month carry little signal: when that happens, say so plainly and pivot to the monthly active-buyer count and the share of returning buyers (buyers with an earlier purchase) for the last complete months, which show whether the customer base is actually shrinking. State the definition explicitly and treat explanations as hypotheses.",
+  "metric_definitions": [
+    "base_buyers = distinct buyers in month M (excluding cancelled items)",
+    "lapsed_buyers = base buyers with no purchase in month M+1",
+    "lapse_rate = lapsed_buyers / base_buyers",
+    "returning_buyer_share = buyers in month M with any earlier purchase / buyers in month M"
+  ],
+  "grain": "monthly transition M -> M+1, last 6 complete transitions",
+  "sql": "WITH buyer_months AS (\n  SELECT DISTINCT oi.user_id AS user_id, DATE_TRUNC(DATE(oi.created_at), MONTH) AS month\n  FROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\n  WHERE oi.status != 'Cancelled'\n    AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 7 MONTH)\n    AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\n)\nSELECT base.month AS base_month,\n  COUNT(*) AS base_buyers,\n  COUNTIF(nxt.user_id IS NULL) AS lapsed_buyers,\n  ROUND(SAFE_DIVIDE(COUNTIF(nxt.user_id IS NULL), COUNT(*)), 4) AS lapse_rate\nFROM buyer_months AS base\nLEFT JOIN buyer_months AS nxt\n  ON nxt.user_id = base.user_id AND nxt.month = DATE_ADD(base.month, INTERVAL 1 MONTH)\nWHERE base.month < DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 1 MONTH)\nGROUP BY base_month\nORDER BY base_month",
+  "analyst_report": "Definition: lapse rate = share of month-M buyers with no purchase in month M+1 (churn proxy; no subscription data).\nTrend: the latest transition <latest_rate> versus an average of <baseline_rate> for the prior months.\nIf lapse is near-total every month: one-month churn is not informative here; report active buyers <buyers_trend> and returning-buyer share <returning_share_trend> instead.\nExplanation: compare the lapsed cohort's categories, return and cancellation rates with retained buyers; treat findings as hypotheses.\nActions: if returns are elevated in the lapsed cohort, review product quality; trigger win-back offers within <days> days of a first purchase.",
+  "tags": [
+    "churn",
+    "retention",
+    "customers",
+    "monthly",
+    "cohort"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T06:30:00Z"
+}

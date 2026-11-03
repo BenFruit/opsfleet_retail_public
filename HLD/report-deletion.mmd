@@ -1,0 +1,12 @@
+flowchart TD
+    U["Delete request under trusted demo identity"] --> FIND["Owner and current-brand-scoped literal / ID / conversation / all lookup"]
+    FIND --> CAP{"At most 100 matches?"}
+    CAP -->|no| NARROW["Require narrower scope; no partial deletion"]
+    CAP -->|yes| PREVIEW["Show IDs, titles, count; freeze exact IDs in process for 5 minutes"]
+    PREVIEW --> ASK{"Separate exact /confirm?"}
+    ASK -->|"cancel / new question / reset / restart / expiry"| CANCEL["Invalidate preview; no deletion"]
+    ASK -->|yes| VERIFY["Consume pending approval; bypass Gemini"]
+    VERIFY --> DELETE["Transaction: recheck owner and current brands; delete frozen IDs only"]
+    DELETE -->|"confirmed commit"| DONE["Report actual deleted count"]
+    DELETE -->|"error or uncertain commit"| FAIL["No success claim; inspect library before fresh preview"]
+    NOTE["Real login and durable signed tokens are production proposals, not current implementation"] -.-> VERIFY

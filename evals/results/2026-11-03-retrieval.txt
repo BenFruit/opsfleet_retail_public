@@ -1,0 +1,38 @@
+ok   0.760 top=monthly-revenue-trend        expected=monthly-revenue-trend        What was our revenue each month this year?
+ok   0.800 top=monthly-revenue-trend        expected=monthly-revenue-trend        Show me revenue broken down by month
+ok   0.773 top=last-month-vs-previous       expected=last-month-vs-previous       Did sales go up or down last month versus the month before?
+ok   0.684 top=last-month-vs-previous       expected=last-month-vs-previous       How did October sales change compared with September?
+ok   0.780 top=top-customers-by-spend       expected=top-customers-by-spend       List the customers who spent the most with us
+ok   0.710 top=top-customers-by-spend       expected=top-customers-by-spend       Top 10 buyers by total purchase amount
+ok   0.664 top=product-comparison           expected=product-comparison           Why are Shorts selling better than Swim?
+ok   0.626 top=product-comparison           expected=product-comparison           Compare Outerwear & Coats with Blazers & Jackets
+ok   0.780 top=brand-gross-profit           expected=brand-gross-profit           Which brand had the best margin in October?
+ok   0.833 top=brand-gross-profit           expected=brand-gross-profit           Brand profitability for last month
+ok   0.771 top=state-spend-comparison       expected=state-spend-comparison       Do customers in New York spend less than in Florida?
+ok   0.761 top=state-spend-comparison       expected=state-spend-comparison       Why is the average order in Texas lower than in California?
+ok   0.813 top=age-band-spend               expected=age-band-spend               Which age groups are our biggest spenders?
+ok   0.745 top=age-band-spend               expected=age-band-spend               How much do buyers aged 20-30 spend compared with 40-50?
+ok   0.735 top=customer-churn-proxy         expected=customer-churn-proxy         How many customers stopped buying from us recently?
+ok   0.789 top=customer-churn-proxy         expected=customer-churn-proxy         Retention looks worse, are customers leaving?
+ok   0.758 top=quarterly-business-review    expected=quarterly-business-review    Prepare a Q3 review with recommendations for next quarter
+ok   0.798 top=quarterly-business-review    expected=quarterly-business-review    Put together a quarterly report with conclusions and an action plan
+ok   0.803 top=return-rate-by-category      expected=return-rate-by-category      What share of items get sent back, by category?
+ok   0.720 top=return-rate-by-category      expected=return-rate-by-category      Where do we get the most returns?
+ok   0.770 top=traffic-source-performance   expected=traffic-source-performance   Is Facebook or Search bringing better customers?
+ok   0.764 top=traffic-source-performance   expected=traffic-source-performance   Effectiveness of our traffic sources
+ok   0.770 top=dataset-overview             expected=dataset-overview             What kind of questions can I ask about this data?
+ok   0.741 top=dataset-overview             expected=dataset-overview             Which tables are in the database?
+neg  0.655 top=dataset-overview             expected=-                            Hello, who are you?
+neg  0.626 top=quarterly-business-review    expected=-                            Remember that I prefer bullet points
+neg  0.629 top=quarterly-business-review    expected=-                            Delete all reports mentioning Nike
+neg  0.537 top=last-month-vs-previous       expected=-                            What's the weather in Astana today?
+neg  0.525 top=brand-gross-profit           expected=-                            Write me a poem about the sea
+neg  0.654 top=monthly-revenue-trend        expected=-                            Show my saved reports
+
+Top similarity: positives min=0.626 median=0.770; negatives max=0.655 median=0.629
+{"threshold": 0.5, "hit_at_1": 1.0, "recall_at_3": 1.0, "negative_false_positive_rate": 1.0}
+{"threshold": 0.55, "hit_at_1": 1.0, "recall_at_3": 1.0, "negative_false_positive_rate": 0.6666666666666666}
+{"threshold": 0.6, "hit_at_1": 1.0, "recall_at_3": 1.0, "negative_false_positive_rate": 0.6666666666666666}
+{"threshold": 0.65, "hit_at_1": 0.9583333333333334, "recall_at_3": 0.9583333333333334, "negative_false_positive_rate": 0.3333333333333333}
+{"threshold": 0.7, "hit_at_1": 0.875, "recall_at_3": 0.875, "negative_false_positive_rate": 0.0}
+Best: {"threshold": 0.66, "hit_at_1": 0.9583333333333334, "recall_at_3": 0.9583333333333334, "negative_false_positive_rate": 0.0}

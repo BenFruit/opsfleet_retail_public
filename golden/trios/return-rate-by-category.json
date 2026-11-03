@@ -1,0 +1,27 @@
+{
+  "id": "return-rate-by-category",
+  "version": 1,
+  "status": "approved",
+  "question": "Which categories have the highest return rates?",
+  "paraphrases": [
+    "Returns analysis",
+    "Where are customers returning products?"
+  ],
+  "interpretation": "Return rate is returned items divided by all non-cancelled items in the period, by category. Only report categories with enough volume to be meaningful and show the item count next to the rate. Lost revenue is the sale price of returned items.",
+  "metric_definitions": [
+    "return_rate = items with status 'Returned' / non-cancelled items",
+    "returned_revenue = SUM(sale_price) of returned items"
+  ],
+  "grain": "category, last 6 complete months",
+  "sql": "SELECT p.category AS category,\n  COUNT(*) AS items,\n  COUNTIF(oi.status = 'Returned') AS returned_items,\n  ROUND(SAFE_DIVIDE(COUNTIF(oi.status = 'Returned'), COUNT(*)), 4) AS return_rate,\n  ROUND(SUM(IF(oi.status = 'Returned', oi.sale_price, 0)), 2) AS returned_revenue\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nJOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id\nWHERE oi.status != 'Cancelled'\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 6 MONTH)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\nGROUP BY category\nHAVING COUNT(*) >= 50\nORDER BY return_rate DESC",
+  "analyst_report": "Over <period>, <top_return_category> has the highest return rate (<rate>) on <items> items, costing <returned_revenue> in returned sales.\nCaveats: categories with fewer than the volume threshold were excluded; return reasons are not in the data.\nActions: review sizing guidance and product descriptions for the top categories; monitor the rate monthly.",
+  "tags": [
+    "returns",
+    "category",
+    "quality",
+    "operations"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

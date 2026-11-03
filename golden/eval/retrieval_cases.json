@@ -1,0 +1,122 @@
+[
+  {
+    "question": "What was our revenue each month this year?",
+    "expected": "monthly-revenue-trend"
+  },
+  {
+    "question": "Show me revenue broken down by month",
+    "expected": "monthly-revenue-trend"
+  },
+  {
+    "question": "Did sales go up or down last month versus the month before?",
+    "expected": "last-month-vs-previous"
+  },
+  {
+    "question": "How did October sales change compared with September?",
+    "expected": "last-month-vs-previous"
+  },
+  {
+    "question": "List the customers who spent the most with us",
+    "expected": "top-customers-by-spend"
+  },
+  {
+    "question": "Top 10 buyers by total purchase amount",
+    "expected": "top-customers-by-spend"
+  },
+  {
+    "question": "Why are Shorts selling better than Swim?",
+    "expected": "product-comparison"
+  },
+  {
+    "question": "Compare Outerwear & Coats with Blazers & Jackets",
+    "expected": "product-comparison"
+  },
+  {
+    "question": "Which brand had the best margin in October?",
+    "expected": "brand-gross-profit"
+  },
+  {
+    "question": "Brand profitability for last month",
+    "expected": "brand-gross-profit"
+  },
+  {
+    "question": "Do customers in New York spend less than in Florida?",
+    "expected": "state-spend-comparison"
+  },
+  {
+    "question": "Why is the average order in Texas lower than in California?",
+    "expected": "state-spend-comparison"
+  },
+  {
+    "question": "Which age groups are our biggest spenders?",
+    "expected": "age-band-spend"
+  },
+  {
+    "question": "How much do buyers aged 20-30 spend compared with 40-50?",
+    "expected": "age-band-spend"
+  },
+  {
+    "question": "How many customers stopped buying from us recently?",
+    "expected": "customer-churn-proxy"
+  },
+  {
+    "question": "Retention looks worse, are customers leaving?",
+    "expected": "customer-churn-proxy"
+  },
+  {
+    "question": "Prepare a Q3 review with recommendations for next quarter",
+    "expected": "quarterly-business-review"
+  },
+  {
+    "question": "Put together a quarterly report with conclusions and an action plan",
+    "expected": "quarterly-business-review"
+  },
+  {
+    "question": "What share of items get sent back, by category?",
+    "expected": "return-rate-by-category"
+  },
+  {
+    "question": "Where do we get the most returns?",
+    "expected": "return-rate-by-category"
+  },
+  {
+    "question": "Is Facebook or Search bringing better customers?",
+    "expected": "traffic-source-performance"
+  },
+  {
+    "question": "Effectiveness of our traffic sources",
+    "expected": "traffic-source-performance"
+  },
+  {
+    "question": "What kind of questions can I ask about this data?",
+    "expected": "dataset-overview"
+  },
+  {
+    "question": "Which tables are in the database?",
+    "expected": "dataset-overview"
+  },
+  {
+    "question": "Hello, who are you?",
+    "expected": null
+  },
+  {
+    "question": "Remember that I prefer bullet points",
+    "expected": null
+  },
+  {
+    "question": "Delete all reports mentioning Nike",
+    "expected": null
+  },
+  {
+    "question": "What's the weather in Astana today?",
+    "expected": null
+  },
+  {
+    "question": "Write me a poem about the sea",
+    "expected": null
+  },
+  {
+    "question": "Show my saved reports",
+    "expected": null
+  }
+]

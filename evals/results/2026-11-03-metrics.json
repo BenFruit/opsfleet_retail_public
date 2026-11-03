@@ -1,0 +1,57 @@
+{
+  "turns": 30,
+  "partial_answer_rate": 0.0,
+  "failed_turns": 0,
+  "latency_seconds": {
+    "p50": 17.716,
+    "p95": 85.745
+  },
+  "per_turn_mean": {
+    "model_calls": 1.97,
+    "sql_attempts": 0.93,
+    "tokens": 9466,
+    "scan_mb": 15.7
+  },
+  "sql": {
+    "turns_with_sql": 19,
+    "first_attempt_success_rate": 0.632,
+    "turns_with_errors": 7,
+    "recovered_after_error_rate": 1.0,
+    "failures_by_code": {
+      "query_rejected": 7
+    },
+    "failures_by_stage": {
+      "dry_run": 7
+    }
+  },
+  "model": {
+    "failures_by_code": {},
+    "retries": 2,
+    "fallbacks": 2,
+    "answered_by": {
+      "gemini-3.5-flash-lite": 58,
+      "gemini-3.6-flash": 1
+    }
+  },
+  "golden": {
+    "retrievals": 15,
+    "hit_rate": 0.867,
+    "top_similarity_p50": 0.765,
+    "failures": 0,
+    "most_used": {
+      "last-month-vs-previous": 8,
+      "monthly-revenue-trend": 6,
+      "brand-gross-profit": 5,
+      "top-customers-by-spend": 5,
+      "traffic-source-performance": 3
+    }
+  },
+  "grounding": {
+    "repair": 1
+  },
+  "reports": {
+    "prepare_delete": 2
+  },
+  "deletions_confirmed": 0,
+  "dependency_warnings": {}
+}

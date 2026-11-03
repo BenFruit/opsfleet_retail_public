@@ -1,0 +1,30 @@
+{
+  "id": "product-comparison",
+  "version": 1,
+  "status": "approved",
+  "question": "Compare the performance of product category X and Y and explain why they differ.",
+  "paraphrases": [
+    "Why does Jeans perform better than Sweaters?",
+    "Compare two products"
+  ],
+  "interpretation": "Compare like-for-like over the same complete period. Explain differences through decomposition: units sold, average selling price, discount versus retail price, return rate and estimated margin. Correlations are hypotheses, not proven causes. Use the user's actual product or category names; discover exact values first if unsure.",
+  "metric_definitions": [
+    "completed_revenue = SUM(sale_price) WHERE status = 'Complete'",
+    "return_rate = returned items / all items",
+    "estimated_margin = SUM(sale_price - p.cost) for completed items",
+    "avg_discount = 1 - AVG(sale_price / retail_price)"
+  ],
+  "grain": "category, last 6 complete months",
+  "sql": "SELECT p.category AS category,\n  COUNTIF(oi.status = 'Complete') AS completed_units,\n  ROUND(SUM(IF(oi.status = 'Complete', oi.sale_price, 0)), 2) AS completed_revenue,\n  ROUND(SUM(IF(oi.status = 'Complete', oi.sale_price - p.cost, 0)), 2) AS estimated_margin,\n  ROUND(SAFE_DIVIDE(COUNTIF(oi.status = 'Returned'), COUNT(*)), 4) AS return_rate,\n  ROUND(1 - AVG(SAFE_DIVIDE(oi.sale_price, p.retail_price)), 4) AS avg_discount\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nJOIN `bigquery-public-data.thelook_ecommerce.products` AS p ON oi.product_id = p.id\nWHERE p.category IN ('Jeans', 'Sweaters')\n  AND DATE(oi.created_at) >= DATE_SUB(DATE_TRUNC(CURRENT_DATE(), MONTH), INTERVAL 6 MONTH)\n  AND DATE(oi.created_at) < DATE_TRUNC(CURRENT_DATE(), MONTH)\nGROUP BY category\nORDER BY completed_revenue DESC",
+  "analyst_report": "Comparison over <period>: <category_a> earned <revenue_a> versus <revenue_b> for <category_b>.\nDecomposition: units <units_a> vs <units_b>; margin <margin_a> vs <margin_b>; return rate <return_a> vs <return_b>; average discount <discount_a> vs <discount_b>.\nHypotheses: higher returns or deeper discounts can explain weaker margin; validate with a monthly breakdown before acting.\nActions: review sizing or quality for the high-return category; test reduced discounting where demand is strong.",
+  "tags": [
+    "product",
+    "category",
+    "comparison",
+    "margin",
+    "returns"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

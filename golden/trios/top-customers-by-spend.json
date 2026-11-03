@@ -1,0 +1,28 @@
+{
+  "id": "top-customers-by-spend",
+  "version": 1,
+  "status": "approved",
+  "question": "Who are our top customers by total spend?",
+  "paraphrases": [
+    "Top 20 customers by spend",
+    "Best customers ranking"
+  ],
+  "interpretation": "Rank customers by user_id only; names, emails and addresses are never used. Spend counts only completed purchases of the manager's authorized brands, not the customer's whole history. Demographic attributes must not be attached to individual customers.",
+  "metric_definitions": [
+    "total_spend = SUM(oi.sale_price) WHERE status = 'Complete'",
+    "orders = COUNT(DISTINCT oi.order_id)",
+    "last_purchase = MAX(DATE(oi.created_at))"
+  ],
+  "grain": "customer (user_id), all time",
+  "sql": "SELECT oi.user_id AS user_id,\n  ROUND(SUM(oi.sale_price), 2) AS total_spend,\n  COUNT(DISTINCT oi.order_id) AS orders,\n  MAX(DATE(oi.created_at)) AS last_purchase\nFROM `bigquery-public-data.thelook_ecommerce.order_items` AS oi\nWHERE oi.status = 'Complete'\nGROUP BY user_id\nORDER BY total_spend DESC\nLIMIT 20",
+  "analyst_report": "Top customers: the top 20 user IDs account for <top20_share> of completed revenue in scope.\nPattern: compare order counts; a few large orders versus frequent repeat purchases call for different retention tactics.\nCaveats: spend covers authorized brands only; identities and demographics are intentionally not shown.\nActions: flag top customers whose last purchase is older than <inactive_days> days for a win-back campaign.",
+  "tags": [
+    "customers",
+    "ranking",
+    "spend",
+    "clv"
+  ],
+  "provenance": "synthetic-reviewed",
+  "reviewer": "yerassyl.pirzhanov",
+  "approved_at": "2026-11-03T00:00:00Z"
+}

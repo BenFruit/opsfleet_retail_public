@@ -1,0 +1,7 @@
+.venv
+/.env
+/.env.langfuse
+/access.local.json
+/logs/
+__pycache__/
+*.pyc

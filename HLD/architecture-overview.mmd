@@ -1,0 +1,22 @@
+flowchart LR
+    U["Operator CLI - implemented prototype"] --> APP["main.py -> ChatApplication -> AnalyticalAgent"]
+    ACCESS["Trusted startup manager-brand mapping"] --> APP
+    DOC["Optional style-only Google Doc"] --> APP
+    APP <--> LLM["Google Gemini API - remote"]
+    APP --> QS["QueryService: SQL policy, brand scope, dry run, capped execution"]
+    QS <--> BQ[("BigQuery TheLook - remote")]
+    APP <--> RM["Reports and user-memory modules"]
+    RM <--> PG[("reports-postgres: PostgreSQL 17 + pgvector")]
+    RM --> EMB["Google embedding API - remote"]
+    QS --> RG["Result guard in the agent: shape, scalars, size, cohort"]
+    RG --> APP
+    APP --> OUT["Guarded prose + checked tables"]
+    OUT --> U
+    APP -.-> LOG["Allowlisted local JSON logs"]
+    APP -.-> LF["Optional local Langfuse - raw payload privacy gap"]
+    LF --> STORE[("Independent Langfuse storage stack")]
+    BUCKET["golden/trios: reviewed Question-SQL-Report JSON"] --> INGEST["golden.ingest job: validate, dry run, embed changed, atomic publish"]
+    INGEST -->|"golden_ingest role: write"| PG
+    APP -->|"retail_agent role: read-only retrieval before planning"| PG
+    INGEST --> EMB
+    FUTURE["Real login and production services: NOT implemented"]
