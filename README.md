@@ -35,12 +35,13 @@ You need: [uv](#why-uv) (installs Python 3.13 for you), the
 [Google Cloud CLI](https://cloud.google.com/sdk/docs/install), Docker (Docker
 Desktop on Windows/macOS), a Google Cloud project with the BigQuery API enabled
 (the free tier is enough) and a Gemini API key from
-[Google AI Studio](https://aistudio.google.com/apikey). Local port 5433 must be
-free for the database container. Clone the repository and run every command from
-its root:
+[Google AI Studio](https://aistudio.google.com/apikey). The database container
+listens on local port 5433; if that port is taken, set `REPORTS_POSTGRES_PORT` in
+`.env` to a free one (Docker Compose and the application both read it). Clone the
+repository and run every command from its root:
 
 ```bash
-git clone <this repository's URL> opsfleet_retail
+git clone https://github.com/BenFruit/opsfleet_retail_public.git opsfleet_retail
 cd opsfleet_retail
 ```
 
@@ -360,8 +361,8 @@ results and are not redacted: use demo data only. Stop with `docker compose down
   (same for 002 and 003). In PowerShell:
   `Get-Content docker/reports-postgres/004_golden_knowledge.sql -Raw | docker compose exec -T reports-postgres psql -U postgres -d retail_agent -v ON_ERROR_STOP=1`.
   Fresh volumes run all of them automatically.
-- **Port 5433 already in use:** another PostgreSQL is listening there; stop it,
-  or change the published port in `docker-compose.yaml` and `REPORTS_POSTGRES_PORT`.
+- **Port 5433 already in use:** set `REPORTS_POSTGRES_PORT` in `.env` to a free
+  port and run step 5 again; Docker Compose and the application both read it.
 - **"Your application has authenticated using end user credentials ... without a
   quota project"**: run `gcloud auth application-default set-quota-project`.
 

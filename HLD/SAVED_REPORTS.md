@@ -14,7 +14,7 @@ evidence and persistent conversational memory are future improvements only.
 
 `reports-postgres` uses PostgreSQL 17 with pgvector, a dedicated
 `reports_postgres_data` volume and a non-superuser `retail_agent` role. Only
-127.0.0.1:5433 is exposed. Langfuse's PostgreSQL and volume are independent.
+127.0.0.1 is exposed (port 5433 unless `REPORTS_POSTGRES_PORT` sets another). Langfuse's PostgreSQL and volume are independent.
 
 Reports contain ID, owner, conversation ID, title, text, creation timestamp,
 768-dimensional embedding, embedding model ID and trusted brand scope. Google

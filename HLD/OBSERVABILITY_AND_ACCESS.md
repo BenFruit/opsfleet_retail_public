@@ -98,7 +98,7 @@ The repository's root `docker-compose.yaml` adapts the upstream Langfuse stack
 for local development; no separate source clone is needed. See README for commands.
 It includes web/worker, PostgreSQL, ClickHouse, Redis and MinIO, with named volumes.
 Public ports are bound to loopback; Langfuse databases have no published ports.
-The separate application reports/memory PostgreSQL publishes loopback port 5433. Fixed demo
+The separate application reports/memory PostgreSQL publishes loopback port 5433 by default. Fixed demo
 passwords, salt, session secret and encryption key live in Compose for a one-command
 MVP startup. No `.env.langfuse` is required; real CLI project API keys stay in ignored
 `.env`. Before production replace all demo secrets with managed secrets, including
